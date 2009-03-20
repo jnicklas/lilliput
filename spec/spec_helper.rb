@@ -1,7 +1,7 @@
 $:.push File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'rubygems'
-require 'bloggy'
+require 'lilliput'
 require 'spec'
 
 def fixture_path(filename='')

@@ -1,22 +1,35 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe Bloggy::Post do
+describe Lilliput::Post do
   
   before do
-    @shenanigans = Bloggy::Post.new fixture_path('2008-09-12-activerecord-shenanigans.md')
-    @nirvana = Bloggy::Post.new fixture_path('2020-02-03-seek-nirvana.md')
-    @hostile = Bloggy::Post.new fixture_path('2006-05-12.md')
+    Lilliput.author = 'Monkey Boy'
+    Lilliput.email = 'monkey@example.com'
+    Lilliput.folder = fixture_path
+    
+    @shenanigans = Lilliput::Post.new fixture_path('2008-09-12-activerecord-shenanigans.md')
+    @nirvana = Lilliput::Post.new fixture_path('2020-02-03-seek-nirvana.md')
+    @hostile = Lilliput::Post.new fixture_path('2006-05-12.md')
+    @monkey = Lilliput::Post.new fixture_path('2008-08-10-monkey.md')
   end
   
   describe '#author' do
     it "should get the author from the last line" do
       @hostile.author.should == 'Jonas Nicklas'
     end
+    
+    it "should get the author from lilliput if there isn't on in the post" do
+      @shenanigans.author.should == 'Monkey Boy'
+    end
   end
   
   describe '#email' do
     it "should get the email from the last line" do
       @hostile.email.should == 'jonas.nicklas@gmail.com'
+    end
+    
+    it "should get the email from lilliput if there isn't on in the post" do
+      @shenanigans.email.should == 'monkey@example.com'
     end
   end
   
@@ -43,14 +56,14 @@ describe Bloggy::Post do
   end
   
   describe '#contents' do
-    it "should get the contents" do
-      @shenanigans.content.should == File.read(fixture_path('2008-09-12-activerecord-shenanigans.md'))
+    it "should get the contents without the title" do
+      @shenanigans.content.should =~ /^Irure dolor/
     end
   end
   
   describe '#html' do
     it "should transform the contents to html" do
-      @shenanigans.html.should =~ %r(<h1 id='how_to_cheat_at_ar'>How to Cheat at AR</h1>)
+      @shenanigans.html.should =~ /<p>Irure dolor/
     end
   end
   
@@ -61,6 +74,27 @@ describe Bloggy::Post do
     
     it "should be false if the published on date is in the future" do
       @nirvana.should_not be_published
+    end
+  end
+  
+  describe '#previous' do
+    it "should return the previous published post" do
+      @shenanigans.previous.should == @monkey
+    end
+    
+    it "should be nil if there isn't one" do
+      @hostile.previous.should be_nil
+    end
+  end
+  
+  describe '#next' do
+    it "should return the next published post" do
+      @hostile.next.should == @monkey
+    end
+    
+    it "should be nil if there isn't one" do
+      p @shenanigans.next
+      @shenanigans.next.should be_nil
     end
   end
   
